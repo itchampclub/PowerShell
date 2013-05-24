@@ -7,7 +7,7 @@ $workbook = $excel.Workbooks.Add()
 #$S3 = $workbook.Sheets | ? {$_.Name -eq "Sheet3"}
 #$S2.Delete()
 #$S3.Delete()
-$worksheets = $workbooks.worksheets
+$worksheets = $workbook.worksheets
 $worksheets.Item(2).delete()
 $worksheets.Item(2).delete()
 $S1 = $worksheets.Item(1)
