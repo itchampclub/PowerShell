@@ -2,11 +2,15 @@ $excel = New-Object -com excel.application
 $excel.Visible = $true
 $excel.DisplayAlerts = $false
 $workbook = $excel.Workbooks.Add()
-$S1 = $workbook.Sheets | ? {$_.Name -eq "Sheet1"}
-$S2 = $workbook.Sheets | ? {$_.Name -eq "Sheet2"}
-$S3 = $workbook.Sheets | ? {$_.Name -eq "Sheet3"}
-$S2.Delete()
-$S3.Delete()
+#$S1 = $workbook.Sheets | ? {$_.Name -eq "Sheet1"}
+#$S2 = $workbook.Sheets | ? {$_.Name -eq "Sheet2"}
+#$S3 = $workbook.Sheets | ? {$_.Name -eq "Sheet3"}
+#$S2.Delete()
+#$S3.Delete()
+$worksheets = $workbooks.worksheets
+$worksheets.Item(2).delete()
+$worksheets.Item(2).delete()
+$S1 = $worksheets.Item(1)
 $S1.Name = "test"
 $workbook.author = "Tommy Becker" 
 $workbook.title = "Spreadsheet Tester" 
