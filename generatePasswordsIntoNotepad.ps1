@@ -1,4 +1,4 @@
-param(
+﻿param(
   [UInt32] $Length=8,
   [Switch] $LowerCase=$TRUE,
   [Switch] $UpperCase=$TRUE,

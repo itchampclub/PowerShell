@@ -1,4 +1,4 @@
-$excel = New-Object -com excel.application
+﻿$excel = New-Object -com excel.application
 $excel.Visible = $true
 $excel.DisplayAlerts = $false
 $workbook = $excel.Workbooks.Add()
@@ -28,5 +28,3 @@ $S1.range("E5:E5").cells.formula = "=sum(e2,E4)"
 $S1.Cells.Item(1,1).value2 = "hello test"
 $S1.SaveAs("excel test.xlsx")
 $excel.Quit()
-[System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel)
-Remove-Variable excel

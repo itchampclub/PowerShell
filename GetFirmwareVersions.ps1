@@ -1,4 +1,4 @@
-<# you need to set these values as Administrator
+﻿<# you need to set these values as Administrator
 Set-Item wsman:.\localhost\MaxBatchItems -Value 100
 Set-Item wsman:.\localhost\Client\AllowUnencrypted -Value $true
 Set-Item wsman:.\localhost\Client\TrustedHosts -Value *
