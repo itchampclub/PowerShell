@@ -89,7 +89,7 @@ $tempFile = [io.path]::GetTempFileName()
 }
 
 
-Get-Content $tempFile
+#Get-Content $tempFile
 notepad $tempFile
-Start-Sleep -s 10
+Start-Sleep -s 1
 Remove-Item $tempFile
