@@ -4,7 +4,6 @@
 .Synopsis
    Process terminated user accounts.
 .DESCRIPTION
-   Long description
 .EXAMPLE
    Start-ProcessTerminations
 
@@ -18,8 +17,6 @@
 .OUTPUTS
    Outputs errors (if any) or strings to paste into Termination Tickets.
 #>
-
-#region Finished and Tested
 [CmdletBinding(
     DefaultParameterSetName='FromOU', 
     SupportsShouldProcess=$true, 
@@ -97,8 +94,6 @@ $GridColumns =
     @{name="Office 365 User";expression={$_.O365}}
 
 }#begin end
-#endregion Finished and Tested
-
 PROCESS {#process start
 Write-Debug "Process Section Start"
 
@@ -120,6 +115,10 @@ switch($PSCmdlet.ParameterSetName)
 
 #region Preprocessing
 Write-Debug "Pre-processing start"
+
+$HSWarning = (New-Object -ComObject wscript.shell).popup("Do not archive homespaces that are outside US.",300,"Homeshare Warning",0x1131)
+if($HSWarning -ne 1){"Please read and accept warning.";return}
+
 if($Terminations -eq $null){Write-Output 'No users were returned from internal query.';return}
 #There are more efficient ways to do this, but I want very fine control over debugging.
 $NewNoteMemberFalse=@{PassThru=$true;Type='NoteProperty';Force=$true;Value=$false}
@@ -159,7 +158,7 @@ if(!(Test-Path $ArchiveRoot\$QuarterDir)){md $QuarterDir -ea ignore|out-null}
 
 foreach($user in $SelectedAccounts)
 {#begin foreach user
-Write-Progress -id 0 -Activity "Processing User accounts." -Status "Current account: $($user.logon)" -PercentComplete $(($($SelectedAccounts.IndexOf($user)+1)/$($SelectedAccounts.count))*100)
+Write-Progress -id 0 -Activity "Processing User accounts." -Status "Current account: $($user.logon)" -PercentComplete $(($(try{$SelectedAccounts.IndexOf($user)}catch{0})/$($SelectedAccounts.count+1))*100)
 
 $username = $user.logon
 $UserDir = "$ArchiveRoot\$QuarterDir\$username"
@@ -193,7 +192,15 @@ if($user.ExchangeOver2010)
 {
     if(Test-Path "$UserDir\pst"){rni -Path "$UserDir\pst" -NewName "$UserDir\pst.pre-existing.$(get-date -f MM-dd-yy.HHmm)" |out-null}
     md -Path "$UserDir\pst"|Out-Null
-    New-ExCAS_MailboxExportRequest -FilePath "$UserDir\pst\$username.pst" -Mailbox $username -Name "$username-archiveToPST"|Out-Null
+    if((Get-ExCAS_MailboxExportRequest -Name "$username-archiveToPST") -eq $null)
+    {
+        New-ExCAS_MailboxExportRequest -FilePath "$UserDir\pst\$username.pst" -Mailbox $username -Name "$username-archiveToPST"|Out-Null
+        $user.MailboxArchiveMessage = "Mailbox archival has started."
+    }
+    else
+    {
+        $user.MailboxArchiveMessage = "Mailbox archival was already run."
+    }
     $loop = $true
     do
     {
@@ -241,18 +248,18 @@ else
 #region CleanUp and Wait
 
 Get-ExCAS_MailboxExportRequest -Name "$username-archiveToPST" | Remove-ExCAS_MailboxExportRequest -Confirm:$false
-if($user.hashomedirectory)
+if($(Get-Job $username-homespace -ea ignore) -ne $null)
 {
     Get-Job $username-homespace -ea Ignore | Wait-Job |Out-Null
     $error.Clear()
     Receive-Job $username-homespace
     if($error.Count -eq 0)
     {
-        $user.homespacemessage = "Homespace has been archived to $UserDir\homespace\."
+        $user.homespacemessage = "Homespace $HomespaceSource has been archived to $UserDir\homespace\."
     }
     else
     {
-        $user.homespacemessage = "Homespace has been archived, but with errors."
+        $user.homespacemessage = "Homespace $HomespaceSource has been archived, but with errors."
         $error.Clear()
     }
 }
@@ -269,7 +276,7 @@ $true
         if($error.Count -eq 0)
         {
             Disable-ExCAS_Mailbox $username -Confirm:$false|Out-Null
-            $user.MailboxDisableMessage = "Mailbox has been disabled."
+            $user.MailboxDisableMessage = "Mailbox has been disabled on $($user.'Mail Server')."
         }
         else
         {
@@ -311,7 +318,7 @@ $true
 }#End Delete Account Switch
 #endregion Delete Account
 
-Write-Output @"
+$Output = @"
 ----------- Copy into ticket --------------------------------
 Termination of $($user.'display name')
 AD Account: $($user.logon)
@@ -321,14 +328,21 @@ $($user.MailboxDisableMessage)
 $($user.AccountDeletedMessage)
 $(if($user.O365){"Account Uses Office 365."})
 
-"@                                               
-}# end foreach user                                 
-                                               
+"@
+Write-Output $Output
+$Output | Out-File -FilePath $UserDir\log-$(get-date -f MM-dd-yy.HHmm).txt -Append
+
+}# end foreach user
+
 }#process end
-end
-{
+END {
+$SelectedAccounts|Out-File -Append -FilePath $ArchiveRoot\log-$(get-date -f MM-dd-yy.HHmm).txt
 $SelectedAccounts|Out-GridView
 Get-Job -State Completed|Remove-Job
 $SelectedAccounts
 }
 }#function end
+
+Start-ProcessTerminations
+""
+If (!($psISE)){"Press any key to continue...";[void][System.Console]::ReadKey($true)}
