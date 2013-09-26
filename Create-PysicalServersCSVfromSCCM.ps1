@@ -1,0 +1,2 @@
+﻿.\Get-DataFromSQLScript.ps1 -server housccm -sql '\\housccm\d$\_scripts\ConfigMgr 2012 Scripts\SQL\All Physical Servers.sql'|select name|Export-Csv -NoTypeInformation -Path scripts:\noble\PhysicalServers-fromSCCM.csv -Force
+(Get-Content scripts:\noble\PhysicalServers-fromSCCM.csv) -replace """",""|Set-Content scripts:\noble\PhysicalServers-fromSCCM.csv
