@@ -57,7 +57,7 @@ Aryana's iPhone     iPhone 4s
     [PSCustomObject]
     
 .Link
-    
+    https://github.com/mockmyberet/PowerShell/blob/master/Get-AppleDeviceLocation
 #>
 
     [cmdletbinding()] 
