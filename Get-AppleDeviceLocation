@@ -1,6 +1,5 @@
 function Get-AppleDeviceLocation
 { 
-#Requires -Version 3
 <#
 .Synopsis
     Gets device locations from iCloud.
@@ -70,6 +69,7 @@ Aryana's iPhone     iPhone 4s
           [switch] $AllDevices,
           [switch] $DontWaitForLocationFix
          ) 
+    if($PSVersionTable.PSVersion.Major -lt 3){Write-Error "This function requires Powershell 3 or above." -ea Stop;break}
 
     $clientId = [guid]::NewGuid() 
 
