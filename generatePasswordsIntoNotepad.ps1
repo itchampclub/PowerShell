@@ -24,8 +24,9 @@ $CHARSET_SYMBOL = 8
 $charsLower = 97..122 | foreach-object { [Char] $_ }
 $charsUpper = 65..90 | foreach-object { [Char] $_ }
 $charsNumber = 48..57 | foreach-object { [Char] $_ }
-$charsSymbol = 35,36,42,43,44,45,46,47,58,59,61,63,64,
-  91,92,93,95,123,125,126 | foreach-object { [Char] $_ }
+#$charsSymbol = 35,36,42,43,44,45,46,47,58,59,61,63,64,
+#  91,92,93,95,123,125,126 | foreach-object { [Char] $_ }
+$charsSymbol = 36,43,44,45,46,61,63,64,95,126 | foreach-object { [Char] $_ }
 
 $charList = @()
 $charSets = 0
