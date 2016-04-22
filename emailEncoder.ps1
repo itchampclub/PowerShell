@@ -1,6 +1,7 @@
 function Get-EncodedEmail
 {
-param(
+param
+(
 [string]$email = "tommy.becker@gmail.com"
 )
 Write-Host -NoNewline "[string](0..$($email.Length-1)|%{[char][int](46+("""
