@@ -1,7 +1,7 @@
 function Get-EncodedEmail
 {
-﻿param(
-$email = "tommy.becker@gmail.com"
+param(
+[string]$email = "tommy.becker@gmail.com"
 )
 Write-Host -NoNewline "[string](0..$($email.Length-1)|%{[char][int](46+("""
 [int[]][char[]]$email | foreach{Write-Host -NoNewline "$($_-46)".Replace(0,"00").Substring(0,2)}
